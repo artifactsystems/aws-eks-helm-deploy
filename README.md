@@ -7,7 +7,7 @@ Deploy Helm charts to AWS EKS
 Add the following snippet to the script section of your `bitbucket-pipelines.yml` file:
 
 ```yaml
-- pipe: docker://yvogl/aws-eks-helm-deploy:1.2.0
+- pipe: docker://ghcr.io/artifactsystems/aws-eks-helm-deploy:1.2.0-1
   variables:
     AWS_ACCESS_KEY_ID: "<string>"
     AWS_SECRET_ACCESS_KEY: "<string>"
@@ -20,8 +20,8 @@ Add the following snippet to the script section of your `bitbucket-pipelines.yml
 | Variable                  | Usage                                                                  |
 | ------------------------- | ---------------------------------------------------------------------- |
 | AWS_REGION                | AWS Region. Default: `eu-central-1`. |
-| AWS_ACCESS_KEY_ID (*)     | AWS Access Key ID |
-| AWS_SECRET_ACCESS_KEY (*) | AWS Secret Access Key |
+| AWS_ACCESS_KEY_ID         | AWS Access Key ID |
+| AWS_SECRET_ACCESS_KEY     | AWS Secret Access Key |
 | ROLE_ARN                  | AWS IAM Role to assume when access EKS |
 | SESSION_NAME              | AWS STS Session name |
 | CLUSTER_NAME (*)          | Name of the AWS EKS cluster |
@@ -33,7 +33,9 @@ Add the following snippet to the script section of your `bitbucket-pipelines.yml
 | VALUES                    | Local values YAML files which should be passed to Helm (--values) |
 | DEBUG                     | Debug. Default: `false`. |
 | WAIT                      | Wait until application is ready. Default: `false`. |
-| DEBUG                     | Debug. Default: `false`. |
+| ATOMIC                    | Atomic deployment. Default: `false`. |
+| HELM_DEBUG                | Helm debug mode. Default: `false`. |
+| SECRETS                   | Enable helm secrets. Default: `false`. |
 
 _(*) = required variable._
 
@@ -45,7 +47,7 @@ Basic example:
 
 ```yaml
 script:
-  - pipe: docker://yvogl/aws-eks-helm-deploy:1.2.0
+  - pipe: docker://ghcr.io/artifactsystems/aws-eks-helm-deploy:1.2.0-1
     variables:
       NAME: "foobar"
 ```
@@ -70,7 +72,7 @@ script:
         - aws configure set source_profile default --profile vault
         - aws configure set region eu-central-1 --profile vault
         - aws secretsmanager get-secret-value --secret-id application/secret --profile vault | jq -r ".SecretString" > secrets.yaml
-  - pipe: docker://yvogl/aws-eks-helm-deploy:1.2.0
+  - pipe: docker://ghcr.io/artifactsystems/aws-eks-helm-deploy:1.2.0-1
     variables:
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY

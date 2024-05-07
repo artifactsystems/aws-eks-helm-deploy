@@ -23,8 +23,8 @@ def get_schema():
     default_session_name = 'BitbucketPipe'
   return {
     'AWS_REGION': {'type': 'string', 'required': False, 'default': 'eu-central-1'},
-    'AWS_ACCESS_KEY_ID': {'type': 'string', 'required': True},
-    'AWS_SECRET_ACCESS_KEY': {'type': 'string', 'required': True},
+    'AWS_ACCESS_KEY_ID': {'type': 'string', 'required': False},
+    'AWS_SECRET_ACCESS_KEY': {'type': 'string', 'required': False},
     'ROLE_ARN': {'type': 'string', 'required': False, 'nullable': True},
     'SESSION_NAME': {'type': 'string', 'required': False, 'default': default_session_name},
     'CLUSTER_NAME': {'type': 'string', 'required': True},
@@ -35,5 +35,8 @@ def get_schema():
     'SET': {'type': 'list', 'required': False, 'default': []},
     'VALUES': {'type': 'list', 'required': False, 'default': []},
     'WAIT': {'type': 'boolean', 'required': False, 'default': False},
-    'DEBUG': {'type': 'boolean', 'required': False, 'default': False}
+    'DEBUG': {'type': 'boolean', 'required': False, 'default': False},
+    'ATOMIC': {'type': 'boolean', 'required': False, 'default': False},
+    'HELM_DEBUG': {'type': 'boolean', 'required': False, 'default': False},
+    'SECRETS': {'type': 'boolean', 'required': False, 'default': False},
   }

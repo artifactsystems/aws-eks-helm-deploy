@@ -21,89 +21,85 @@ from .error import HelmError, HelmChartNotFoundError
 
 class HelmClient:
 
-  chart = None
-  namespace = 'kube-public'
-  create_namespace = False
-  release = None
-  set = []
-  _values = []
-  wait = False
+    chart = None
+    namespace = "kube-public"
+    create_namespace = False
+    release = None
+    set = []
+    _values = []
+    wait = False
+    debug = False
+    atomic = False
+    secrets = False
 
-  def __init__(self, chart):
+    def __init__(self, chart):
 
-    self.chart = chart
+        self.chart = chart
 
-    # chart_yaml_path = os.path.join(
-    #   chart,
-    #   'Chart.yaml'
-    # )
+        # chart_yaml_path = os.path.join(
+        #   chart,
+        #   'Chart.yaml'
+        # )
 
-    # Do not check existence of Chart.yaml file. Chart can also be specified
-    # using an URL or repository and chart name.
+        # Do not check existence of Chart.yaml file. Chart can also be specified
+        # using an URL or repository and chart name.
 
-    # if os.path.isfile(chart_yaml_path):
-    #   self.chart = chart
-    # else:
-    #   raise HelmChartNotFoundError(chart_yaml_path)
+        # if os.path.isfile(chart_yaml_path):
+        #   self.chart = chart
+        # else:
+        #   raise HelmChartNotFoundError(chart_yaml_path)
 
-  def install(self):
+    def install(self):
 
-    command = [
-      'helm',
-      'upgrade'
-    ]
+        command = ["helm"]
 
-    if self.release is not None:
-      command.append(self.release)
+        if self.release is not None:
+            command.append("secrets")
 
-    command += (
-      self.chart,
-      '--install',
-      '--namespace',
-      self.namespace
-    )
+        command.append("upgrade")
 
-    for set in self.set:
-      command += (
-        '--set',
-        set
-      )
+        if self.release is not None:
+            command.append(self.release)
 
-    for value in self.values:
-      command += (
-        '--values',
-        value
-      )
+        command += (self.chart, "--install", "--namespace", self.namespace)
 
-    if self.wait:
-      command.append('--wait')
+        for set in self.set:
+            command += ("--set", set)
 
-    if self.create_namespace:
-      command.append('--create-namespace')
+        for value in self.values:
+            command += ("--values", value)
 
-    return self._run(command)
+        if self.wait:
+            command.append("--wait")
 
-  def _run(self, command):
-    try:
-      helm = subprocess.run(
-        command,
-        capture_output=True
-      )
+        if self.create_namespace:
+            command.append("--create-namespace")
 
-      helm.check_returncode()
+        if self.atomic:
+            command.append("--atomic")
 
-      return helm.stdout.decode('utf-8')
+        if self.debug:
+            command.append("--debug")
+        return self._run(command)
 
-    except CalledProcessError as error:
-      raise HelmError(helm.stderr.decode('utf-8'))
+    def _run(self, command):
+        try:
+            helm = subprocess.run(command, capture_output=True)
 
-  @property
-  def values(self):
-    return self._values
+            helm.check_returncode()
 
-  @values.setter
-  def values(self, value):
-    for file in value:
-      if not os.path.isfile(file):
-        raise ValueError(f'Cannot access file {file}')
-    self._values = value
+            return helm.stdout.decode("utf-8")
+
+        except CalledProcessError as error:
+            raise HelmError(helm.stderr.decode("utf-8"))
+
+    @property
+    def values(self):
+        return self._values
+
+    @values.setter
+    def values(self, value):
+        for file in value:
+            if not os.path.isfile(file):
+                raise ValueError(f"Cannot access file {file}")
+        self._values = value
